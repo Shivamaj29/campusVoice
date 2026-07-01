@@ -1,0 +1,6 @@
+{
+  "name": "Smart College Complaint System Documentation",
+  "description": "System Design Documentation for Smart College Complaint, Feedback & Academic Review Management System.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

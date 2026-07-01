@@ -1,0 +1,1352 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart College Complaint System - System Design Documentation</title>
+    
+    <!-- Google Fonts for Modern, High-End Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js CDN for Analytics Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Custom CSS Stylesheet -->
+    <link rel="stylesheet" href="/style.css" />
+    
+    <!-- Vanilla JS Scripts -->
+    <script src="/script.js" defer></script>
+  </head>
+  <body>
+
+    <!-- Scroll Progress Indicator -->
+    <div class="scroll-progress-container">
+      <div id="scroll-progress"></div>
+    </div>
+
+    <!-- Top Navigation Bar -->
+    <nav class="top-navbar" id="top-navbar">
+      <div class="nav-left">
+        <button class="hamburger-btn" id="hamburger-btn" aria-label="Toggle Sidebar Menu">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+        </button>
+        <a href="#overview" class="logo-container">
+          <div class="logo-icon">SC</div>
+          <div class="logo-text">
+            <h1>Smart College</h1>
+            <span>Grievance Documentation Portal</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="nav-right">
+        <!-- Live Global Search -->
+        <div class="search-box">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="doc-search" placeholder="Search documentation..." autocomplete="off">
+        </div>
+
+        <!-- Light/Dark Mode Toggle Button -->
+        <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle Dark Mode">
+          <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+          <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Master Application Container -->
+    <div class="app-container">
+
+      <!-- Sticky Left Sidebar Navigation -->
+      <aside class="sidebar" id="sidebar">
+        <nav class="sidebar-nav">
+          <div class="sidebar-heading">Introduction</div>
+          <ul class="sidebar-menu">
+            <li><a href="#overview" class="active"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Overview</a></li>
+            <li><a href="#problem-statement"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg> Problem Statement</a></li>
+            <li><a href="#objectives"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/><circle cx="12" cy="12" r="4"/></svg> Objectives</a></li>
+          </ul>
+
+          <div class="sidebar-heading">System Design</div>
+          <ul class="sidebar-menu">
+            <li><a href="#user-roles"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> User Roles</a></li>
+            <li><a href="#functional-modules"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/><path d="M15 3v18"/><path d="M3 9h18"/><path d="M3 15h18"/></svg> Functional Modules</a></li>
+            <li><a href="#escalation-workflow"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Escalation Workflow</a></li>
+            <li><a href="#business-rules"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Business Rules</a></li>
+          </ul>
+
+          <div class="sidebar-heading">Technical Specs</div>
+          <ul class="sidebar-menu">
+            <li><a href="#database-design"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg> Database Design</a></li>
+            <li><a href="#technology-stack"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg> Technology Stack</a></li>
+            <li><a href="#dashboards-preview"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg> Dashboard Preview</a></li>
+            <li><a href="#system-architecture"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg> System Architecture</a></li>
+          </ul>
+
+          <div class="sidebar-heading">Outcomes & Timeline</div>
+          <ul class="sidebar-menu">
+            <li><a href="#development-timeline"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Development Timeline</a></li>
+            <li><a href="#expected-outcomes"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> Expected Outcomes</a></li>
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- Main Content Container -->
+      <main class="main-content" id="main-content">
+
+        <!-- ==================================================================
+             SECTION 1: HERO / OVERVIEW
+             ================================================================== -->
+        <section id="overview" class="doc-section fade-in-on-scroll">
+          <div class="hero-wrapper">
+            <div class="hero-main">
+              <div class="hero-text">
+                <span class="section-meta">System Overview</span>
+                <h2>Smart College <span>Complaint, Feedback & Academic Review System</span></h2>
+                <p>A centralized, enterprise-grade grievance management portal for college environments. Streamline student complaints, structure course/teacher feedback, manage exam re-evaluations, automate escalations, and deliver key operational analytics.</p>
+                <div class="hero-actions">
+                  <a href="#escalation-workflow" class="btn btn-primary">
+                    View Workflow
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" x2="19" y1="12" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                  </a>
+                  <a href="#database-design" class="btn btn-outline">Database Schema</a>
+                </div>
+              </div>
+              <div class="hero-image">
+                <!-- SVG Illustration representing communication, workflow and safety -->
+                <svg class="hero-illustration" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="100" cy="100" r="80" fill="url(#hero-grad)" fill-opacity="0.15"/>
+                  <rect x="50" y="40" width="100" height="120" rx="10" fill="var(--surface)" stroke="var(--primary)" stroke-width="3" />
+                  <line x1="65" y1="65" x2="135" y2="65" stroke="var(--primary)" stroke-width="3" stroke-linecap="round" />
+                  <line x1="65" y1="85" x2="120" y2="85" stroke="var(--text-muted)" stroke-width="2.5" stroke-linecap="round" />
+                  <line x1="65" y1="105" x2="110" y2="105" stroke="var(--text-muted)" stroke-width="2.5" stroke-linecap="round" />
+                  <circle cx="130" cy="120" r="24" fill="var(--accent)" stroke="var(--surface)" stroke-width="3" />
+                  <path d="M124 120L128 124L136 116" stroke="var(--text-inverse)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+                  <defs>
+                    <linearGradient id="hero-grad" x1="20" y1="20" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="var(--primary)" />
+                      <stop offset="1" stop-color="var(--accent)" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Hero Feature Cards -->
+            <div class="hero-stats">
+              <h3 class="hero-stats-title">Core System Pillars</h3>
+              <div class="stats-grid">
+                <div class="stat-item">
+                  <div class="stat-number" data-target="1">0</div>
+                  <div class="stat-label">Unified MERN Stack</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number" data-target="100" data-suffix="%">0</div>
+                  <div class="stat-label">JWT Secure Auth</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number" data-target="50" data-suffix="ms">0</div>
+                  <div class="stat-label">Firebase Push Notifications</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number" data-target="99" data-suffix="%">0</div>
+                  <div class="stat-label">Database Integrity</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number" data-target="7">0</div>
+                  <div class="stat-label">Role Based Access</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number" data-target="3">0</div>
+                  <div class="stat-label">Analytics Dashboards</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             SECTION 2: PROBLEM STATEMENT
+             ================================================================== -->
+        <section id="problem-statement" class="doc-section fade-in-on-scroll">
+          <span class="section-meta">Context & Landscape</span>
+          <h2 class="section-title">Problem Statement</h2>
+          <p class="section-desc">Traditional manual academic dispute resolution and complaint lodging mechanisms in educational institutions suffer from major structural and communication bottlenecks.</p>
+
+          <div class="grid-2">
+            <div class="card problem-item">
+              <div class="problem-icon-container">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><line x1="12" x2="12" y1="18" y2="18"/><line x1="10" x2="14" y1="6" y2="6"/><line x1="10" x2="14" y1="10" y2="10"/><line x1="10" x2="14" y1="14" y2="14"/></svg>
+              </div>
+              <div class="problem-info">
+                <h3>Manual Handling & Paper Trails</h3>
+                <p>Complaints and reviews require tedious, hand-written submission forms. Physical documents are easily lost, misplaced, or forgotten on desks.</p>
+              </div>
+            </div>
+
+            <div class="card problem-item">
+              <div class="problem-icon-container">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="problem-info">
+                <h3>Zero Tracking & Updates</h3>
+                <p>Students have no visual or real-time method to track the progress of their filed grievances or academic reviews once submitted.</p>
+              </div>
+            </div>
+
+            <div class="card problem-item">
+              <div class="problem-icon-container">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              </div>
+              <div class="problem-info">
+                <h3>No Notifications or Alerts</h3>
+                <p>Absence of automated notifications leaves students and teaching authorities completely unaware of status changes, assignments, or escalations.</p>
+              </div>
+            </div>
+
+            <div class="card problem-item">
+              <div class="problem-icon-container">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20"/><path d="M20 12v8H4v-8"/><path d="m15 5-3-3-3 3"/><path d="M12 2v10"/></svg>
+              </div>
+              <div class="problem-info">
+                <h3>Delayed Resolution (No Escalation)</h3>
+                <p>When an intermediate authority fails to act on a concern, the system lacks automatic routing structures to escalate the matter to senior heads.</p>
+              </div>
+            </div>
+
+            <div class="card problem-item">
+              <div class="problem-icon-container">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+              </div>
+              <div class="problem-info">
+                <h3>Poor Integrity & Security</h3>
+                <p>Open paper formats lead to breaches of student privacy, allowing unauthorized individuals to read, tamper with, or dismiss sensitive issues.</p>
+              </div>
+            </div>
+
+            <div class="card problem-item">
+              <div class="problem-icon-container">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+              </div>
+              <div class="problem-info">
+                <h3>No Analytical Insights</h3>
+                <p>College heads and HODs have no access to structured data. It is impossible to identify persistent departmental challenges or faculty review spikes.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             SECTION 3: SYSTEM OBJECTIVES
+             ================================================================== -->
+        <section id="objectives" class="doc-section fade-in-on-scroll">
+          <span class="section-meta">Vision & Roadmap</span>
+          <h2 class="section-title">System Objectives</h2>
+          <p class="section-desc">The primary goal of the system is to establish a fast, high-integrity, and automated digital workspace for resolving diverse student complaints and review petitions.</p>
+
+          <div class="grid-4">
+            <div class="card objective-card">
+              <div class="objective-icon-wrapper">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="9" x2="15" y1="9" y2="9"/><line x1="9" x2="15" y1="13" y2="13"/><line x1="9" x2="13" y1="17" y2="17"/></svg>
+              </div>
+              <h3>Digital Complaint Hub</h3>
+              <p>Completely digitize grievance registrations with secure authentication, categorized tagging, and optional file attachments.</p>
+            </div>
+
+            <div class="card objective-card">
+              <div class="objective-icon-wrapper">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><rect width="20" height="5" x="2" y="3" rx="1"/></svg>
+              </div>
+              <h3>Transparent Workflow</h3>
+              <p>Keep students fully informed of who is handling their grievance, current department assignment, and active status updates.</p>
+            </div>
+
+            <div class="card objective-card">
+              <div class="objective-icon-wrapper">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4-4-4"/><path d="M4 20V10a4 4 0 0 1 4-4h8"/></svg>
+              </div>
+              <h3>Auto Escalation</h3>
+              <p>Enforce strict resolution SLA windows. If a level is idle, automatically escalate to the next hierarchical tier.</p>
+            </div>
+
+            <div class="card objective-card">
+              <div class="objective-icon-wrapper">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 16 2-6 6-2-2 6-6 2Z"/></svg>
+              </div>
+              <h3>Real-Time Analytics</h3>
+              <p>Equip college administration and HODs with actionable visual metrics on response rates and unresolved problems.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             SECTION 4: USER ROLES
+             ================================================================== -->
+        <section id="user-roles" class="doc-section fade-in-on-scroll">
+          <span class="section-meta">Access Control Matrix</span>
+          <h2 class="section-title">User Roles & Permissions</h2>
+          <p class="section-desc">A strict Role-Based Access Control (RBAC) model dictates actions, read bounds, and assignment boundaries for college actors.</p>
+
+          <div class="user-roles-grid">
+            <!-- Student -->
+            <div class="card role-card student-role">
+              <div class="role-header">
+                <div class="role-badge">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"/></svg>
+                </div>
+                <h3 class="role-title">Student</h3>
+              </div>
+              <ul class="role-features-list">
+                <li><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Submit Complaint</li>
+                <li><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Post Course/Facility Feedback</li>
+                <li><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Academic Review Requests</li>
+                <li><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Track Status and Timeline</li>
+                <li><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Receive Real-time Notifications</li>
+              </ul>
+            </div>
+
+            <!-- Teacher -->
+            <div class="card role-card teacher-role">
+              <div class="role-header">
+                <div class="role-badge">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
+                </div>
+                <h3 class="role-title">Teacher / Lab Head</h3>
+              </div>
+              <ul class="role-features-list">
+                <li><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> View Assigned Complaints (L1)</li>
+                <li><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Submit Remarks & Close Cases</li>
+                <li><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Forward to Tutor Guardian</li>
+              </ul>
+            </div>
+
+            <!-- Tutor Guardian -->
+            <div class="card role-card tg-role">
+              <div class="role-header">
+                <div class="role-badge">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <h3 class="role-title">Tutor Guardian</h3>
+              </div>
+              <ul class="role-features-list">
+                <li><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Review L2 Escalated Issues</li>
+                <li><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Multi-student counseling logs</li>
+                <li><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Escalate to Class Incharge</li>
+              </ul>
+            </div>
+
+            <!-- Class Incharge -->
+            <div class="card role-card ci-role">
+              <div class="role-header">
+                <div class="role-badge">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                </div>
+                <h3 class="role-title">Class Incharge</h3>
+              </div>
+              <ul class="role-features-list">
+                <li><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Class performance audit</li>
+                <li><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Investigate Batch disputes</li>
+                <li><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Direct route to Department HOD</li>
+              </ul>
+            </div>
+
+            <!-- HOD -->
+            <div class="card role-card hod-role">
+              <div class="role-header">
+                <div class="role-badge">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <h3 class="role-title">HOD</h3>
+              </div>
+              <ul class="role-features-list">
+                <li><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Department analytics panel</li>
+                <li><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Delegate / Reassign cases</li>
+                <li><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Review Academic Re-evaluations</li>
+              </ul>
+            </div>
+
+            <!-- Committee -->
+            <div class="card role-card committee-role">
+              <div class="role-header">
+                <div class="role-badge">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <h3 class="role-title">Committee</h3>
+              </div>
+              <ul class="role-features-list">
+                <li><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Final resolution board panels</li>
+                <li><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Collective voting on major issues</li>
+                <li><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Irrevocable executive finality</li>
+              </ul>
+            </div>
+
+            <!-- Admin -->
+            <div class="card role-card admin-role">
+              <div class="role-header">
+                <div class="role-badge">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                </div>
+                <h3 class="role-title">System Admin</h3>
+              </div>
+              <ul class="role-features-list">
+                <li><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> System Configuration</li>
+                <li><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> SLA Configuration Rules</li>
+                <li><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Audit logs & raw report exports</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             SECTION 5: FUNCTIONAL MODULES
+             ================================================================== -->
+        <section id="functional-modules" class="doc-section fade-in-on-scroll">
+          <span class="section-meta">System Modules</span>
+          <h2 class="section-title">Functional Modules</h2>
+          <p class="section-desc">Click through the interactive tabs to explore the inner functional sub-modules of the college platform.</p>
+
+          <!-- Interactive Module Tabs -->
+          <div class="module-tabs">
+            <button class="module-tab-btn active" data-module="mod-complaint">1. Complaint Management</button>
+            <button class="module-tab-btn" data-module="mod-feedback">2. Feedback Loop</button>
+            <button class="module-tab-btn" data-module="mod-review">3. Academic Review</button>
+            <button class="module-tab-btn" data-module="mod-notification">4. Notifications</button>
+            <button class="module-tab-btn" data-module="mod-analytics">5. Dashboard Analytics</button>
+            <button class="module-tab-btn" data-module="mod-admin">6. Administration</button>
+          </div>
+
+          <!-- Module Panel Content Wrapper -->
+          <div class="module-content-wrapper">
+            
+            <!-- Tab 1: Complaint Management -->
+            <div class="module-panel active" id="mod-complaint">
+              <div class="module-info-col">
+                <span class="module-num">Module 01</span>
+                <h3 class="module-name">Complaint Management</h3>
+                <p class="module-desc">The core ticket engine of the system. Allows students to log categorized, authenticated grievances and monitor their active state transitions.</p>
+                <ul class="module-feats">
+                  <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Secure Rich Attachment upload</li>
+                  <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Live visual timeline tracking</li>
+                  <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Dynamic Department / Category routing</li>
+                </ul>
+              </div>
+              <div class="module-visual-col">
+                <div class="doc-mock-file">
+                  <div class="doc-mock-line blue"></div>
+                  <div class="doc-mock-line"></div>
+                  <div class="doc-mock-line short"></div>
+                  <div class="doc-mock-line green"></div>
+                  <div class="doc-mock-seal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 2: Feedback Loop -->
+            <div class="module-panel" id="mod-feedback">
+              <div class="module-info-col">
+                <span class="module-num">Module 02</span>
+                <h3 class="module-name">Course & Facility Feedback</h3>
+                <p class="module-desc">Systematic academic feedback. Students can submit periodic evaluation reviews for instructors, curriculum modules, and campus facilities.</p>
+                <ul class="module-feats">
+                  <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Anonymous feedback options (identity privacy)</li>
+                  <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Multi-criterion rating dials</li>
+                  <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Faculty sentiment analysis logs</li>
+                </ul>
+              </div>
+              <div class="module-visual-col">
+                <div class="feedback-avatar-grid">
+                  <div class="anon-avatar">?</div>
+                  <div class="feedback-bubble">
+                    <div class="doc-mock-line blue" style="height:6px; margin-bottom: 4px;"></div>
+                    <p style="font-size: 0.75rem; color:var(--text-muted);">"Instructor is excellent, but needs to share slide decks earlier."</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 3: Academic Review -->
+            <div class="module-panel" id="mod-review">
+              <div class="module-info-col">
+                <span class="module-num">Module 03</span>
+                <h3 class="module-name">Academic Review Requests</h3>
+                <p class="module-desc">Allows students to file structured requests for exam re-evaluations, grade audits, and credit reviews under specific subjects.</p>
+                <ul class="module-feats">
+                  <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Course-to-faculty auto matching</li>
+                  <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Mandatory objective proof attachments</li>
+                  <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Secure score revision auditing</li>
+                </ul>
+              </div>
+              <div class="module-visual-col">
+                <div class="review-selection">
+                  <div class="review-row"><span>Mid-Term Re-eval</span><span class="pill pill-warning">Pending</span></div>
+                  <div class="review-row"><span>Lab Marks Audit</span><span class="pill pill-success">Approved</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 4: Notifications -->
+            <div class="module-panel" id="mod-notification">
+              <div class="module-info-col">
+                <span class="module-num">Module 04</span>
+                <h3 class="module-name">FCM & Notification Matrix</h3>
+                <p class="module-desc">Real-time alerts that keep all stakeholders immediately informed. Integrates Email, SMS, and Firebase Cloud Messaging (FCM).</p>
+                <ul class="module-feats">
+                  <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Firebase Push Alerts (browser & app)</li>
+                  <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Email summaries of escalations</li>
+                  <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Automated SMS dispatch on resolution</li>
+                </ul>
+              </div>
+              <div class="module-visual-col">
+                <div style="text-align: center;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                  <div style="font-size:0.8rem; font-weight:700; margin-top:0.5rem; color:var(--primary);">Alert: Complaint #1029 Escalated to HOD</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 5: Dashboard Analytics -->
+            <div class="module-panel" id="mod-analytics">
+              <div class="module-info-col">
+                <span class="module-num">Module 05</span>
+                <h3 class="module-name">Executive Analytics</h3>
+                <p class="module-desc">Dynamic chart modules tracking response times, department caseloads, and resolution SLAs across semesters.</p>
+                <ul class="module-feats">
+                  <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Case resolution heatmaps</li>
+                  <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> SLA breach frequency alerts</li>
+                  <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Automated PDF report compiles</li>
+                </ul>
+              </div>
+              <div class="module-visual-col" style="min-height: 250px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+                <div style="font-size:0.8rem; font-weight:700; margin-top:0.5rem; color:var(--text-muted);">Responsive charting enabled</div>
+              </div>
+            </div>
+
+            <!-- Tab 6: Administration -->
+            <div class="module-panel" id="mod-admin">
+              <div class="module-info-col">
+                <span class="module-num">Module 06</span>
+                <h3 class="module-name">Administration Controls</h3>
+                <p class="module-desc">Centralized command center for managing departments, staff roles, course-to-teacher mapping, and general platform parameters.</p>
+                <ul class="module-feats">
+                  <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Bulk student/staff CSV imports</li>
+                  <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Interactive SLA threshold dials</li>
+                  <li><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Platform audit trail logging</li>
+                </ul>
+              </div>
+              <div class="module-visual-col">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <div style="font-size:0.8rem; font-weight:700; margin-top:0.5rem; color:var(--text-muted);">Admin Dashboard Configured</div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             SECTION 6: COMPLAINT ESCALATION WORKFLOW
+             ================================================================== -->
+        <section id="escalation-workflow" class="doc-section fade-in-on-scroll">
+          <span class="section-meta">Incident Pipeline</span>
+          <h2 class="section-title">Complaint Escalation Workflow</h2>
+          <p class="section-desc">An automated SLA-triggered routing pathway ensures that unresolved grievances are escalated sequentially to senior staff nodes.</p>
+
+          <!-- Vertical Interactive Flowchart -->
+          <div class="flowchart-wrapper">
+            
+            <div class="flow-step">
+              <div class="flow-node start-node">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                Student Logs Complaint
+              </div>
+              <div class="flow-connector active"></div>
+            </div>
+
+            <div class="flow-step">
+              <div class="flow-node">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/></svg>
+                Teacher / Lab Head (L1)
+              </div>
+              <div class="flow-connector active"></div>
+            </div>
+
+            <!-- Branch Node 1 -->
+            <div class="flow-branch">
+              <div class="branch-path left">
+                <span class="branch-label left">Resolved</span>
+                <div class="flow-connector active" style="height: 25px;"></div>
+                <div class="flow-node end-node" style="width: 140px;">Closed (L1)</div>
+              </div>
+              <div class="branch-path right">
+                <span class="branch-label right">Unresolved / SLA Breach</span>
+                <div class="flow-connector active" style="height: 25px;"></div>
+                <div class="flow-node decision-node" style="width: 140px;">Tutor Guardian (L2)</div>
+              </div>
+            </div>
+
+            <div class="flow-branch" style="justify-content: flex-end; max-width: 600px;">
+              <div class="branch-path right" style="flex: 0 0 50%;">
+                <div class="flow-connector active"></div>
+              </div>
+            </div>
+
+            <div class="flow-step" style="max-width: 600px; width: 100%; display: flex; flex-direction: column; align-items: flex-end;">
+              <div class="flow-branch" style="width: 100%; margin: 0;">
+                <div class="branch-path left">
+                  <span class="branch-label left">Resolved</span>
+                  <div class="flow-connector active" style="height: 25px;"></div>
+                  <div class="flow-node end-node" style="width: 140px;">Closed (L2)</div>
+                </div>
+                <div class="branch-path right">
+                  <span class="branch-label right">Unresolved / SLA Breach</span>
+                  <div class="flow-connector active" style="height: 25px;"></div>
+                  <div class="flow-node decision-node" style="width: 140px;">Class Incharge (L3)</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-branch" style="justify-content: flex-end; max-width: 600px;">
+              <div class="branch-path right" style="flex: 0 0 50%;">
+                <div class="flow-connector active"></div>
+              </div>
+            </div>
+
+            <div class="flow-step" style="max-width: 600px; width: 100%; display: flex; flex-direction: column; align-items: flex-end;">
+              <div class="flow-branch" style="width: 100%; margin: 0;">
+                <div class="branch-path left">
+                  <span class="branch-label left">Resolved</span>
+                  <div class="flow-connector active" style="height: 25px;"></div>
+                  <div class="flow-node end-node" style="width: 140px;">Closed (L3)</div>
+                </div>
+                <div class="branch-path right">
+                  <span class="branch-label right">Unresolved / SLA Breach</span>
+                  <div class="flow-connector active" style="height: 25px;"></div>
+                  <div class="flow-node decision-node" style="width: 140px;">HOD (L4)</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-branch" style="justify-content: flex-end; max-width: 600px;">
+              <div class="branch-path right" style="flex: 0 0 50%;">
+                <div class="flow-connector active"></div>
+              </div>
+            </div>
+
+            <div class="flow-step" style="max-width: 600px; width: 100%; display: flex; flex-direction: column; align-items: flex-end;">
+              <div class="flow-branch" style="width: 100%; margin: 0;">
+                <div class="branch-path left">
+                  <span class="branch-label left">Resolved</span>
+                  <div class="flow-connector active" style="height: 25px;"></div>
+                  <div class="flow-node end-node" style="width: 140px;">Closed (L4)</div>
+                </div>
+                <div class="branch-path right">
+                  <span class="branch-label right">Unresolved / SLA Breach</span>
+                  <div class="flow-connector active" style="height: 25px;"></div>
+                  <div class="flow-node end-node" style="width: 140px; border-color: var(--danger); background-color: rgba(239, 68, 68, 0.05);">Committee (Final)</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             SECTION 7: BUSINESS RULES
+             ================================================================== -->
+        <section id="business-rules" class="doc-section fade-in-on-scroll">
+          <span class="section-meta">Policy & Compliance</span>
+          <h2 class="section-title">Business Rules</h2>
+          <p class="section-desc">Strict system validations and operational rules designed to preserve academic integrity and response timelines.</p>
+
+          <div class="rules-container">
+            <!-- Accordion Rule 1 -->
+            <div class="rule-accordion active">
+              <button class="rule-header-btn">
+                <div class="rule-title-box">
+                  <div class="rule-num-badge">1</div>
+                  <span class="rule-name-txt">Grievance Lodging Rules</span>
+                </div>
+                <svg class="rule-chevron" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <div class="rule-body">
+                <div class="rule-body-content">
+                  <p>When a student registers a grievance, the system validates eligibility and targets departmental scope:</p>
+                  <ul class="rule-bullet-list">
+                    <li><strong>Unique Case Identifiers:</strong> Every single complaint automatically receives a structured ticket tag (e.g., GR-2026-8841).</li>
+                    <li><strong>Single Classification Rule:</strong> A grievance can only reside in one primary department classification at a time (preventing collision).</li>
+                    <li><strong>Visibility Partition:</strong> Students can only view their own lodged history, while faculties only see assigned cases.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Accordion Rule 2 -->
+            <div class="rule-accordion">
+              <button class="rule-header-btn">
+                <div class="rule-title-box">
+                  <div class="rule-num-badge">2</div>
+                  <span class="rule-name-txt">SLA & Escalation Rules</span>
+                </div>
+                <svg class="rule-chevron" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <div class="rule-body">
+                <div class="rule-body-content">
+                  <p>Escalation routines protect students from neglected tickets. Each operational level operates on strict timeframe limits:</p>
+                  <ul class="rule-bullet-list">
+                    <li><strong>Teacher (Level 1):</strong> Must log a reply/remark or action within <strong>48 Hours</strong>.</li>
+                    <li><strong>Tutor Guardian (Level 2):</strong> Receives breach tickets on Day 3. Must address within <strong>72 Hours</strong>.</li>
+                    <li><strong>Class Incharge (Level 3):</strong> Case escalates automatically on Day 6. Allowed <strong>48 Hours</strong>.</li>
+                    <li><strong>HOD (Level 4):</strong> Direct management on Day 8. Allowed <strong>72 Hours</strong> before final routing.</li>
+                    <li><strong>Committee (Level 5):</strong> Board decision on Day 11. Concludes case with irreversible finality.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Accordion Rule 3 -->
+            <div class="rule-accordion">
+              <button class="rule-header-btn">
+                <div class="rule-title-box">
+                  <div class="rule-num-badge">3</div>
+                  <span class="rule-name-txt">Notification Triggers</span>
+                </div>
+                <svg class="rule-chevron" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <div class="rule-body">
+                <div class="rule-body-content">
+                  <p>The messaging pipeline routes push notifications instantly when state transitions take place:</p>
+                  <ul class="rule-bullet-list">
+                    <li><strong>Ticket Registration:</strong> Dispatches confirmation email to student and alert to L1 Teacher.</li>
+                    <li><strong>Authority Assignments:</strong> Notifies assigned handler with ticket metadata and SLA deadline.</li>
+                    <li><strong>Escalation Alarms:</strong> Flags parent department HOD and flags active breach level.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             SECTION 8: DATABASE DESIGN
+             ================================================================== -->
+        <section id="database-design" class="doc-section fade-in-on-scroll">
+          <span class="section-meta">Entity-Relationship Schema</span>
+          <h2 class="section-title">Database Design</h2>
+          <p class="section-desc">A highly normalized relational MongoDB collection blueprint outlining the parameters and data relationships.</p>
+
+          <div class="db-grid">
+            <!-- User -->
+            <div class="entity-card">
+              <div class="entity-header">
+                <span class="entity-name">User Collection</span>
+                <span class="pill pill-primary">Entity</span>
+              </div>
+              <ul class="entity-attrs-list">
+                <li class="entity-attr"><span class="attr-name primary-key"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="14" x="8" y="2" rx="2" ry="2"/><path d="M16 12h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h2"/></svg> UserID</span><span class="attr-type">ObjectId (PK)</span></li>
+                <li class="entity-attr"><span class="attr-name">Name</span><span class="attr-type">String</span></li>
+                <li class="entity-attr"><span class="attr-name">Email</span><span class="attr-type">String (Unique)</span></li>
+                <li class="entity-attr"><span class="attr-name">Password</span><span class="attr-type">String (Hashed)</span></li>
+                <li class="entity-attr"><span class="attr-name">Role</span><span class="attr-type">Enum</span></li>
+                <li class="entity-attr"><span class="attr-name foreign-key">DepartmentID</span><span class="attr-type">ObjectId (FK)</span></li>
+              </ul>
+            </div>
+
+            <!-- Complaint -->
+            <div class="entity-card">
+              <div class="entity-header">
+                <span class="entity-name">Complaint Collection</span>
+                <span class="pill pill-primary">Entity</span>
+              </div>
+              <ul class="entity-attrs-list">
+                <li class="entity-attr"><span class="attr-name primary-key"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="14" x="8" y="2" rx="2" ry="2"/><path d="M16 12h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h2"/></svg> ComplaintID</span><span class="attr-type">ObjectId (PK)</span></li>
+                <li class="entity-attr"><span class="attr-name foreign-key">StudentID</span><span class="attr-type">ObjectId (FK)</span></li>
+                <li class="entity-attr"><span class="attr-name">Category</span><span class="attr-type">String</span></li>
+                <li class="entity-attr"><span class="attr-name">Description</span><span class="attr-type">String</span></li>
+                <li class="entity-attr"><span class="attr-name">Status</span><span class="attr-type">Enum</span></li>
+                <li class="entity-attr"><span class="attr-name">Priority</span><span class="attr-type">Enum</span></li>
+                <li class="entity-attr"><span class="attr-name">EscalationLevel</span><span class="attr-type">Integer</span></li>
+                <li class="entity-attr"><span class="attr-name">CreatedDate</span><span class="attr-type">DateTime</span></li>
+              </ul>
+            </div>
+
+            <!-- Feedback -->
+            <div class="entity-card">
+              <div class="entity-header">
+                <span class="entity-name">Feedback Collection</span>
+                <span class="pill pill-primary">Entity</span>
+              </div>
+              <ul class="entity-attrs-list">
+                <li class="entity-attr"><span class="attr-name primary-key"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="14" x="8" y="2" rx="2" ry="2"/><path d="M16 12h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h2"/></svg> FeedbackID</span><span class="attr-type">ObjectId (PK)</span></li>
+                <li class="entity-attr"><span class="attr-name foreign-key">StudentID</span><span class="attr-type">ObjectId (FK)</span></li>
+                <li class="entity-attr"><span class="attr-name foreign-key">DepartmentID</span><span class="attr-type">ObjectId (FK)</span></li>
+                <li class="entity-attr"><span class="attr-name">Message</span><span class="attr-type">String</span></li>
+                <li class="entity-attr"><span class="attr-name">Rating</span><span class="attr-type">Integer</span></li>
+              </ul>
+            </div>
+
+            <!-- Academic Review -->
+            <div class="entity-card">
+              <div class="entity-header">
+                <span class="entity-name">Review Collection</span>
+                <span class="pill pill-primary">Entity</span>
+              </div>
+              <ul class="entity-attrs-list">
+                <li class="entity-attr"><span class="attr-name primary-key"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="14" x="8" y="2" rx="2" ry="2"/><path d="M16 12h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h2"/></svg> ReviewID</span><span class="attr-type">ObjectId (PK)</span></li>
+                <li class="entity-attr"><span class="attr-name foreign-key">StudentID</span><span class="attr-type">ObjectId (FK)</span></li>
+                <li class="entity-attr"><span class="attr-name foreign-key">FacultyID</span><span class="attr-type">ObjectId (FK)</span></li>
+                <li class="entity-attr"><span class="attr-name">Subject</span><span class="attr-type">String</span></li>
+                <li class="entity-attr"><span class="attr-name">Reason</span><span class="attr-type">String</span></li>
+                <li class="entity-attr"><span class="attr-name">Status</span><span class="attr-type">Enum</span></li>
+              </ul>
+            </div>
+
+            <!-- Notification -->
+            <div class="entity-card">
+              <div class="entity-header">
+                <span class="entity-name">Notification Collection</span>
+                <span class="pill pill-primary">Entity</span>
+              </div>
+              <ul class="entity-attrs-list">
+                <li class="entity-attr"><span class="attr-name primary-key"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="14" x="8" y="2" rx="2" ry="2"/><path d="M16 12h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h2"/></svg> NotificationID</span><span class="attr-type">ObjectId (PK)</span></li>
+                <li class="entity-attr"><span class="attr-name foreign-key">UserID</span><span class="attr-type">ObjectId (FK)</span></li>
+                <li class="entity-attr"><span class="attr-name">Message</span><span class="attr-type">String</span></li>
+                <li class="entity-attr"><span class="attr-name">Status</span><span class="attr-type">Enum</span></li>
+              </ul>
+            </div>
+
+            <!-- Department -->
+            <div class="entity-card">
+              <div class="entity-header">
+                <span class="entity-name">Department Collection</span>
+                <span class="pill pill-primary">Entity</span>
+              </div>
+              <ul class="entity-attrs-list">
+                <li class="entity-attr"><span class="attr-name primary-key"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="14" x="8" y="2" rx="2" ry="2"/><path d="M16 12h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h2"/></svg> DepartmentID</span><span class="attr-type">ObjectId (PK)</span></li>
+                <li class="entity-attr"><span class="attr-name">DepartmentName</span><span class="attr-type">String</span></li>
+              </ul>
+            </div>
+
+            <!-- Custom ER Relations Cards -->
+            <div class="relationships-connector">
+              <div class="relation-item"><span>User.DepartmentID</span> ──▶ <span>Department.DepartmentID</span> (N:1)</div>
+              <div class="relation-item"><span>Complaint.StudentID</span> ──▶ <span>User.UserID</span> (N:1)</div>
+              <div class="relation-item"><span>Feedback.StudentID</span> ──▶ <span>User.UserID</span> (N:1)</div>
+              <div class="relation-item"><span>Review.FacultyID</span> ──▶ <span>User.UserID</span> (N:1)</div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             SECTION 9: TECHNOLOGY STACK
+             ================================================================== -->
+        <section id="technology-stack" class="doc-section fade-in-on-scroll">
+          <span class="section-meta">Technical Choices</span>
+          <h2 class="section-title">Technology Stack</h2>
+          <p class="section-desc">The modern architecture has been selected to ensure horizontal scale, robust message pipelines, and sub-second feedback alerts.</p>
+
+          <div class="tech-grid">
+            <!-- Frontend -->
+            <div class="card tech-group-card">
+              <h3 class="tech-group-title">Frontend Tier</h3>
+              <div class="tech-items-container">
+                <div class="tech-item">
+                  <div class="tech-logo-container">H</div>
+                  <span class="tech-item-name">HTML5</span>
+                </div>
+                <div class="tech-item">
+                  <div class="tech-logo-container">C</div>
+                  <span class="tech-item-name">CSS3 Variable Grid</span>
+                </div>
+                <div class="tech-item">
+                  <div class="tech-logo-container">J</div>
+                  <span class="tech-item-name">JavaScript ES6</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Backend -->
+            <div class="card tech-group-card">
+              <h3 class="tech-group-title">Backend API</h3>
+              <div class="tech-items-container">
+                <div class="tech-item">
+                  <div class="tech-logo-container">N</div>
+                  <span class="tech-item-name">Node.js Runtime</span>
+                </div>
+                <div class="tech-item">
+                  <div class="tech-logo-container">E</div>
+                  <span class="tech-item-name">Express.js API</span>
+                </div>
+                <div class="tech-item">
+                  <div class="tech-logo-container">J</div>
+                  <span class="tech-item-name">JWT Security</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Database & FCM -->
+            <div class="card tech-group-card">
+              <h3 class="tech-group-title">Storage & Alerts</h3>
+              <div class="tech-items-container">
+                <div class="tech-item">
+                  <div class="tech-logo-container">M</div>
+                  <span class="tech-item-name">MongoDB Atlas</span>
+                </div>
+                <div class="tech-item">
+                  <div class="tech-logo-container">F</div>
+                  <span class="tech-item-name">Firebase FCM</span>
+                </div>
+                <div class="tech-item">
+                  <div class="tech-logo-container">C</div>
+                  <span class="tech-item-name">Chart.js Engine</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Deployment -->
+            <div class="card tech-group-card">
+              <h3 class="tech-group-title">Deploy & Git</h3>
+              <div class="tech-items-container">
+                <div class="tech-item">
+                  <div class="tech-logo-container">A</div>
+                  <span class="tech-item-name">AWS Cloud S3</span>
+                </div>
+                <div class="tech-item">
+                  <div class="tech-logo-container">R</div>
+                  <span class="tech-item-name">Render / Vercel</span>
+                </div>
+                <div class="tech-item">
+                  <div class="tech-logo-container">G</div>
+                  <span class="tech-item-name">Git & GitHub</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             SECTION 10: DASHBOARDS PREVIEW
+             ================================================================== -->
+        <section id="dashboards-preview" class="doc-section fade-in-on-scroll">
+          <span class="section-meta">Operational Control Centers</span>
+          <h2 class="section-title">Dashboard Preview</h2>
+          <p class="section-desc">Interactive widgets and table summaries illustrating key control consoles for students, faculty members, and HOD directors.</p>
+
+          <div class="grid-2">
+            <!-- Student Dashboard Preview -->
+            <div class="card dashboard-preview-card">
+              <div class="dashboard-preview-header">
+                <div class="dashboard-title-box">
+                  <h3>Student Grievance Portal</h3>
+                  <p>Individual student logging dashboard</p>
+                </div>
+                <span class="pill pill-primary">Logged In</span>
+              </div>
+              
+              <div class="dashboard-mock-widgets">
+                <div class="mock-widget">
+                  <div class="mock-widget-val">02</div>
+                  <div class="mock-widget-lbl">Active Complaints</div>
+                </div>
+                <div class="mock-widget">
+                  <div class="mock-widget-val">01</div>
+                  <div class="mock-widget-lbl">Review Requests</div>
+                </div>
+              </div>
+
+              <div class="dashboard-mock-table">
+                <div class="mock-table-row">
+                  <span>ID / Category</span>
+                  <span>Assigned To</span>
+                  <span>Status</span>
+                </div>
+                <div class="mock-table-row">
+                  <span>GR-2026-041 (WiFi Speed)</span>
+                  <span>Prof. Verma</span>
+                  <span class="pill pill-warning">In Progress</span>
+                </div>
+                <div class="mock-table-row">
+                  <span>AR-2026-110 (Grade Audit)</span>
+                  <span>Dr. Sharma</span>
+                  <span class="pill pill-success">Approved</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Teacher Dashboard Preview -->
+            <div class="card dashboard-preview-card" style="border-top-color: #10b981;">
+              <div class="dashboard-preview-header">
+                <div class="dashboard-title-box">
+                  <h3>Teacher Resolution Space</h3>
+                  <p>L1 classroom grievance coordinator</p>
+                </div>
+                <span class="pill pill-success">4 Pending</span>
+              </div>
+              
+              <div class="dashboard-mock-widgets">
+                <div class="mock-widget">
+                  <div class="mock-widget-val" style="color: #10b981;">04</div>
+                  <div class="mock-widget-lbl">Assigned Cases</div>
+                </div>
+                <div class="mock-widget">
+                  <div class="mock-widget-val" style="color: #10b981;">48h</div>
+                  <div class="mock-widget-lbl">Mean SLA Response</div>
+                </div>
+              </div>
+
+              <div class="dashboard-mock-table">
+                <div class="mock-table-row">
+                  <span>Student ID</span>
+                  <span>Subject</span>
+                  <span>Action</span>
+                </div>
+                <div class="mock-table-row">
+                  <span>ST-1084 (Amit Kumar)</span>
+                  <span>Midterm Re-eval</span>
+                  <span style="color: var(--primary); font-weight:700;">Resolve / Escalate</span>
+                </div>
+                <div class="mock-table-row">
+                  <span>ST-1011 (Sneha Patil)</span>
+                  <span>Lab Equipment</span>
+                  <span style="color: var(--primary); font-weight:700;">Resolve / Escalate</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- HOD Department Dashboard Preview -->
+            <div class="card dashboard-preview-card" style="border-top-color: #ec4899;">
+              <div class="dashboard-preview-header">
+                <div class="dashboard-title-box">
+                  <h3>HOD Department Control</h3>
+                  <p>Department-wide overview and escalation monitors</p>
+                </div>
+                <span class="pill pill-danger" style="background-color:rgba(239, 68, 68, 0.12); color:#ef4444;">2 Breaches</span>
+              </div>
+              
+              <div class="dashboard-mock-widgets">
+                <div class="mock-widget">
+                  <div class="mock-widget-val" style="color: #ec4899;">12</div>
+                  <div class="mock-widget-lbl">Total Unresolved</div>
+                </div>
+                <div class="mock-widget">
+                  <div class="mock-widget-val" style="color: #ec4899;">02</div>
+                  <div class="mock-widget-lbl">Escalation Breaches</div>
+                </div>
+              </div>
+
+              <div class="dashboard-mock-table">
+                <div class="mock-table-row">
+                  <span>Case ID</span>
+                  <span>Breach Stage</span>
+                  <span>Alert Level</span>
+                </div>
+                <div class="mock-table-row">
+                  <span>GR-2026-9041</span>
+                  <span>L3 (Class Incharge)</span>
+                  <span class="pill pill-danger">High Alert</span>
+                </div>
+                <div class="mock-table-row">
+                  <span>GR-2026-8851</span>
+                  <span>L2 (Tutor Guardian)</span>
+                  <span class="pill pill-warning">Warning</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Admin Platform Dashboard Preview -->
+            <div class="card dashboard-preview-card" style="border-top-color: #1e293b;">
+              <div class="dashboard-preview-header">
+                <div class="dashboard-title-box">
+                  <h3>Admin System Dashboard</h3>
+                  <p>Global system settings, database logs, and HOD sync</p>
+                </div>
+                <span class="pill pill-info">Online</span>
+              </div>
+              
+              <div class="dashboard-mock-widgets">
+                <div class="mock-widget">
+                  <div class="mock-widget-val" style="color: #1e293b;">1,240</div>
+                  <div class="mock-widget-lbl">Registered Students</div>
+                </div>
+                <div class="mock-widget">
+                  <div class="mock-widget-val" style="color: #1e293b;">94%</div>
+                  <div class="mock-widget-lbl">Global SLA Compliance</div>
+                </div>
+              </div>
+
+              <div class="dashboard-mock-table">
+                <div class="mock-table-row">
+                  <span>Audit Task</span>
+                  <span>Timestamp</span>
+                  <span>Status</span>
+                </div>
+                <div class="mock-table-row">
+                  <span>System SLA Routine Run</span>
+                  <span>10:30 PM</span>
+                  <span class="pill pill-success" style="font-size:0.6rem;">Completed</span>
+                </div>
+                <div class="mock-table-row">
+                  <span>Database backup dump</span>
+                  <span>08:00 PM</span>
+                  <span class="pill pill-success" style="font-size:0.6rem;">Completed</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             SECTION 11: SYSTEM ARCHITECTURE
+             ================================================================== -->
+        <section id="system-architecture" class="doc-section fade-in-on-scroll">
+          <span class="section-meta">Enterprise Infrastructure</span>
+          <h2 class="section-title">System Architecture</h2>
+          <p class="section-desc">Responsive structural diagram detailing communication flows between clients, API gateways, database engines, and third-party notifications.</p>
+
+          <!-- Interactive Responsive Architecture diagram -->
+          <div class="arch-diagram-wrapper">
+            <div class="arch-flow-grid">
+              
+              <div class="arch-node-box">
+                <div class="arch-element">Student Web Browser</div>
+                <div style="font-size: 0.75rem; color:var(--text-muted); font-family:var(--font-mono)">JSON Client Views</div>
+              </div>
+
+              <div class="arch-arrow-connector"></div>
+
+              <div class="arch-node-box">
+                <div class="arch-element core-api">API Gateway / CORS</div>
+                <div style="font-size: 0.75rem; color:var(--text-muted); font-family:var(--font-mono)">JWT Verification</div>
+              </div>
+
+              <div class="arch-arrow-connector"></div>
+
+              <div class="arch-node-box">
+                <div class="arch-element core-api" style="background-color: rgba(59, 130, 246, 0.1);">Express Backend</div>
+                <div style="font-size: 0.75rem; color:var(--text-muted); font-family:var(--font-mono)">Routing Logic</div>
+              </div>
+
+              <div class="arch-arrow-connector"></div>
+
+              <div class="arch-node-box">
+                <div class="arch-element database-node">MongoDB Atlas</div>
+                <div style="font-size: 0.75rem; color:var(--text-muted); font-family:var(--font-mono)">Document Storage</div>
+              </div>
+
+            </div>
+
+            <!-- Side connected services diagram row -->
+            <div class="arch-side-services">
+              <div class="side-service-box">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                <div style="margin-top: 0.5rem; font-weight:700">Firebase Cloud Messaging</div>
+                <div style="font-size:0.75rem; color:var(--text-muted)">Real-time Web Push Alerts</div>
+              </div>
+
+              <div class="side-service-box">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                <div style="margin-top: 0.5rem; font-weight:700">Email API Interface</div>
+                <div style="font-size:0.75rem; color:var(--text-muted)">Automated resolution emails</div>
+              </div>
+
+              <div class="side-service-box">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                <div style="margin-top: 0.5rem; font-weight:700">SMS Gateway Integration</div>
+                <div style="font-size:0.75rem; color:var(--text-muted)">Transactional SLA Notifications</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             SECTION 12: DEVELOPMENT TIMELINE
+             ================================================================== -->
+        <section id="development-timeline" class="doc-section fade-in-on-scroll">
+          <span class="section-meta">Development Milestone Steps</span>
+          <h2 class="section-title">Development Timeline</h2>
+          <p class="section-desc">Horizontal milestone path mapping progress from academic analysis through final project panel evaluations.</p>
+
+          <!-- Responsive Timeline Node Grid -->
+          <div class="timeline-horizontal">
+            <div class="timeline-node">
+              <div class="timeline-dot">1</div>
+              <div class="timeline-title">Problem Identification</div>
+            </div>
+            <div class="timeline-node">
+              <div class="timeline-dot">2</div>
+              <div class="timeline-title">Literature Survey</div>
+            </div>
+            <div class="timeline-node">
+              <div class="timeline-dot">3</div>
+              <div class="timeline-title">Requirement Analysis</div>
+            </div>
+            <div class="timeline-node">
+              <div class="timeline-dot">4</div>
+              <div class="timeline-title">System Design</div>
+            </div>
+            <div class="timeline-node">
+              <div class="timeline-dot">5</div>
+              <div class="timeline-title">Development (MERN)</div>
+            </div>
+            <div class="timeline-node">
+              <div class="timeline-dot">6</div>
+              <div class="timeline-title">Integration & Testing</div>
+            </div>
+            <div class="timeline-node">
+              <div class="timeline-dot">7</div>
+              <div class="timeline-title">Deployment</div>
+            </div>
+            <div class="timeline-node">
+              <div class="timeline-dot">8</div>
+              <div class="timeline-title">Documentation</div>
+            </div>
+            <div class="timeline-node">
+              <div class="timeline-dot">9</div>
+              <div class="timeline-title">Presentation Panel</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             SECTION 13: EXPECTED OUTCOMES
+             ================================================================== -->
+        <section id="expected-outcomes" class="doc-section fade-in-on-scroll">
+          <span class="section-meta">Success Targets</span>
+          <h2 class="section-title">Expected Outcomes</h2>
+          <p class="section-desc">Concrete targets detailing institutional upgrades once the platform is deployed campus-wide.</p>
+
+          <div class="grid-2">
+            
+            <div class="card outcome-card">
+              <div class="outcome-check-box">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="outcome-info">
+                <h3>Centralized Complaint Hub</h3>
+                <p>100% elimination of fragmented paper filing. Centralized dashboard records every campus grievance within a single, secure ledger.</p>
+              </div>
+            </div>
+
+            <div class="card outcome-card">
+              <div class="outcome-check-box">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="outcome-info">
+                <h3>Fully Transparent Workflows</h3>
+                <p>Provides students real-time access to assignment tracking, resolving the classic 'black hole' feeling of offline submissions.</p>
+              </div>
+            </div>
+
+            <div class="card outcome-card">
+              <div class="outcome-check-box">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="outcome-info">
+                <h3>Vastly Accelerated Resolution Times</h3>
+                <p>SLA auto-escalations decrease resolution times from several weeks down to a guaranteed average of 3-5 business days.</p>
+              </div>
+            </div>
+
+            <div class="card outcome-card">
+              <div class="outcome-check-box">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="outcome-info">
+                <h3>Higher Student Satisfaction Rate</h3>
+                <p>Empowers students to safely speak out about infrastructure, fees, or harassment, promoting a responsive campus culture.</p>
+              </div>
+            </div>
+
+            <div class="card outcome-card">
+              <div class="outcome-check-box">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="outcome-info">
+                <h3>Paperless Greener Administration</h3>
+                <p>Aligns campus administration with green sustainability initiatives, eliminating thousands of physical forms annually.</p>
+              </div>
+            </div>
+
+            <div class="card outcome-card">
+              <div class="outcome-check-box">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <div class="outcome-info">
+                <h3>Proactive Institutional Analytics</h3>
+                <p>Provides top management with visual indicators to correct structural problems or improve curriculum quality based on real feedback patterns.</p>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+    <!-- Live Analytics Charts Section (Rendered directly using Chart.js) -->
+    <div style="margin-left: var(--sidebar-width); max-width: calc(100% - var(--sidebar-width)); padding: 0 4rem 4rem 4rem;" class="fade-in-on-scroll">
+      <div class="card" style="padding: 2.5rem;">
+        <span class="section-meta">System Metrics Playground</span>
+        <h3 class="section-title" style="font-size: 1.5rem; margin-bottom: 2rem;">Real-Time Data Visualization Mockup</h3>
+        
+        <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 2.5rem; margin-bottom: 2.5rem;">
+          <div>
+            <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem; font-weight:700; color:var(--text-muted)">1. Category Distribution (Doughnut Chart)</h4>
+            <div style="height: 240px; position:relative;">
+              <canvas id="complaintPieChart"></canvas>
+            </div>
+          </div>
+          <div>
+            <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem; font-weight:700; color:var(--text-muted)">2. Mean Resolution Timeline (Actual vs SLA limit)</h4>
+            <div style="height: 240px; position:relative;">
+              <canvas id="resolutionBarChart"></canvas>
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem; font-weight:700; color:var(--text-muted)">3. Monthly Registration vs Resolution Flow Patterns</h4>
+          <div style="height: 240px; position:relative;">
+            <canvas id="volumeLineChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Master Page Footer -->
+    <footer class="main-footer">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <h2>Smart College Grievance Management System</h2>
+          <p>An enterprise-grade academic grievance, course evaluation, and automatic escalation ecosystem designed to foster speed, accountability, and institutional excellence.</p>
+        </div>
+        <div class="footer-links">
+          <h3>Architectural Stack</h3>
+          <ul class="footer-tech-list">
+            <li>MongoDB</li>
+            <li>Express.js</li>
+            <li>React / Vanilla ES6</li>
+            <li>Node.js</li>
+            <li>JWT Authorization</li>
+            <li>FCM Messaging</li>
+            <li>AWS Cloud</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Smart College Inc. All rights reserved.</span>
+        <span class="footer-meta-tag">College Final Year Design Capstone Project</span>
+      </div>
+    </footer>
+
+    <!-- Back to Top Floating Button -->
+    <button class="back-to-top" id="back-to-top" aria-label="Scroll Back to Top">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+    </button>
+
+  </body>
+</html>
